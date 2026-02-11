@@ -12,25 +12,55 @@
     .card { background:#fff; border-radius:16px; padding:16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); }
     h1 { font-size: 22px; margin: 0 0 10px; }
     .sub { opacity:.75; margin: 0 0 14px; }
+
     .btn { width:100%; border:0; border-radius:14px; padding:14px; margin:10px 0; font-size:16px; font-weight:700; background:#1F6FEB; color:#fff; }
     .btn.secondary { background:#EAF2FF; color:#1F6FEB; }
+    .btn.ghost { background:#F1F5F9; color:#0f172a; }
+
     .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
     .pill { background:#F1F5F9; padding:10px 12px; border-radius:999px; font-weight:700; }
     .koalas { font-size: 28px; letter-spacing: 2px; margin-top: 10px; }
-    .toast { margin-top: 10px; font-weight: 700; }
+    .toast { margin-top: 10px; font-weight: 700; min-height: 24px; }
+
+    .hidden { display:none; }
+
+    /* Game screen */
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .topbar .left { display:flex; gap:10px; flex-wrap:wrap; }
+    .qcard { background:#fff; border-radius:16px; padding:16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); margin-top:12px; }
+    .q { font-size: 38px; font-weight: 900; text-align:center; margin: 6px 0 8px; }
+    .hint { text-align:center; opacity:.75; margin:0 0 10px; }
+    .ans { font-size: 28px; font-weight: 900; text-align:center; background:#F8FAFC; border-radius:14px; padding:12px; min-height: 38px; }
+
+    .keypad { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+    .key { width: calc(33.333% - 6.666px); border:0; border-radius:14px; padding:14px 0; font-size:18px; font-weight:900; background:#fff; }
+    .key.alt { background:#EAF2FF; color:#1F6FEB; }
+    .key.wide { width: calc(66.666% - 3.333px); }
+
+    /* Tiny “celebration” */
+    .pulse {
+      animation: pulse 0.5s ease-in-out 2;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
+
+    <!-- HOME -->
+    <div class="card" id="home">
       <h1>Peri ve İpek’in Koala Ormanı</h1>
       <p class="sub">Bugün 5 dakika. Üzülmek yok. Koalalar büyür.</p>
 
-      <button class="btn" onclick="go('speed')">Hız Turu</button>
-      <button class="btn" onclick="go('target')">Hedef Turu</button>
-      <button class="btn" onclick="go('boss')">Boss</button>
+      <button class="btn" onclick="startMode('speed')">Hız Turu</button>
+      <button class="btn" onclick="startMode('target')">Hedef Turu</button>
+      <button class="btn" onclick="startMode('boss')">Boss</button>
 
-      <button class="btn secondary" onclick="celebrate()">Ormana Bak 🌳</button>
+      <button class="btn secondary" onclick="showForest()">Ormana Bak 🌳</button>
 
       <div class="row">
         <div class="pill">⭐ Yıldız: <span id="stars">0</span></div>
@@ -40,48 +70,246 @@
       <div class="koalas" id="koalas">🐨</div>
       <div class="toast" id="toast"></div>
     </div>
+
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="topbar">
+        <div class="left">
+          <div class="pill">⭐ <span id="gStars">0</span></div>
+          <div class="pill">🍃 <span id="gLeaves">0</span></div>
+          <div class="pill">Soru <span id="gIndex">1</span>/<span id="gTotal">10</span></div>
+        </div>
+        <button class="btn ghost" style="width:auto; margin:0; padding:10px 12px;" onclick="backHome()">Geri</button>
+      </div>
+
+      <div class="qcard" id="qcard">
+        <p class="hint" id="modeText">Hız Turu</p>
+        <div class="q" id="question">2 × 2 = ?</div>
+        <div class="ans" id="answerBox">&nbsp;</div>
+
+        <div class="keypad">
+          <button class="key" onclick="tap('1')">1</button>
+          <button class="key" onclick="tap('2')">2</button>
+          <button class="key" onclick="tap('3')">3</button>
+          <button class="key" onclick="tap('4')">4</button>
+          <button class="key" onclick="tap('5')">5</button>
+          <button class="key" onclick="tap('6')">6</button>
+          <button class="key" onclick="tap('7')">7</button>
+          <button class="key" onclick="tap('8')">8</button>
+          <button class="key" onclick="tap('9')">9</button>
+
+          <button class="key alt" onclick="clearAns()">Sil</button>
+          <button class="key" onclick="tap('0')">0</button>
+          <button class="key alt" onclick="ok()">OK</button>
+        </div>
+
+        <div class="toast" id="gToast"></div>
+      </div>
+    </div>
+
+    <!-- FOREST (şimdilik basit) -->
+    <div class="card hidden" id="forest">
+      <h1>Orman</h1>
+      <p class="sub">Şimdilik basit. Birazdan ağaçları da ekleyeceğiz.</p>
+
+      <div class="row">
+        <div class="pill">Ağaç: <span id="fTrees">1</span></div>
+        <div class="pill">Koala: <span id="fKoalas">1</span></div>
+      </div>
+
+      <div class="koalas" id="fKoalaIcons">🐨</div>
+      <div class="toast" id="fToast"></div>
+
+      <button class="btn ghost" onclick="backHome()">Geri</button>
+    </div>
+
   </div>
 
   <script>
-    // Basit veri (şimdilik): localStorage
-    const SKEY="koala_state_v1";
-    const state = JSON.parse(localStorage.getItem(SKEY) || '{"stars":0,"leaves":0,"koalas":1}');
+    // ====== STATE ======
+    const SKEY="koala_state_v2";
+    const state = JSON.parse(localStorage.getItem(SKEY) || '{"stars":0,"leaves":0,"koalas":1,"trees":1}');
     function save(){ localStorage.setItem(SKEY, JSON.stringify(state)); }
 
-    function render(){
+    function toast(msg){ document.getElementById("toast").textContent = msg; }
+    function gToast(msg){ document.getElementById("gToast").textContent = msg; }
+    function fToast(msg){ document.getElementById("fToast").textContent = msg; }
+
+    function renderHome(){
       document.getElementById("stars").textContent = state.stars;
       document.getElementById("leaves").textContent = state.leaves;
       document.getElementById("koalas").textContent = "🐨".repeat(Math.min(12, state.koalas));
     }
 
-    function toast(msg){ document.getElementById("toast").textContent = msg; }
+    function renderGameTop(){
+      document.getElementById("gStars").textContent = state.stars;
+      document.getElementById("gLeaves").textContent = state.leaves;
+      document.getElementById("gIndex").textContent = game.index + 1;
+      document.getElementById("gTotal").textContent = game.total;
+    }
 
-    // Şimdilik butonlar demo: yıldız ekler, koala doğurtur
-    function go(mode){
-      state.stars += (mode==="boss"?3:1);
-      state.leaves += 1;
-      // her 15 yıldızda koala +1
-      const should = 1 + Math.floor(state.stars/15);
-      if(state.koalas < should){
-        state.koalas = should;
-        toast("Yeni koala doğdu! 🎉");
-      } else {
-        toast("Devam! 🐾");
+    function renderForest(){
+      document.getElementById("fTrees").textContent = state.trees;
+      document.getElementById("fKoalas").textContent = state.koalas;
+      document.getElementById("fKoalaIcons").textContent = "🐨".repeat(Math.min(16, state.koalas));
+    }
+
+    function show(id){
+      document.getElementById("home").classList.add("hidden");
+      document.getElementById("game").classList.add("hidden");
+      document.getElementById("forest").classList.add("hidden");
+      document.getElementById(id).classList.remove("hidden");
+    }
+
+    function backHome(){
+      show("home");
+      renderHome();
+      toast("");
+    }
+
+    function showForest(){
+      show("forest");
+      renderForest();
+      fToast("Orman burada. Yakında ağaçlar çoğalacak 🌳");
+    }
+
+    // ====== GAME ENGINE (MVP) ======
+    const game = {
+      mode: "speed",
+      total: 10,
+      index: 0,
+      a: 2,
+      b: 2,
+      startMs: 0,
+      typed: ""
+    };
+
+    function rand2to9(){ return Math.floor(Math.random()*8)+2; }
+
+    function configForMode(mode){
+      if(mode==="speed") return { total: 12, label: "Hız Turu" };
+      if(mode==="target") return { total: 10, label: "Hedef Turu" };
+      return { total: 20, label: "Boss" };
+    }
+
+    function startMode(mode){
+      const cfg = configForMode(mode);
+      game.mode = mode;
+      game.total = cfg.total;
+      game.index = 0;
+
+      document.getElementById("modeText").textContent = cfg.label;
+      show("game");
+      nextQuestion();
+    }
+
+    function nextQuestion(){
+      game.typed = "";
+      document.getElementById("answerBox").innerHTML = "&nbsp;";
+      gToast("");
+
+      game.a = rand2to9();
+      game.b = rand2to9();
+      document.getElementById("question").textContent = `${game.a} × ${game.b} = ?`;
+      game.startMs = Date.now();
+
+      renderGameTop();
+    }
+
+    function tap(d){
+      if(game.typed.length >= 3) return;
+      game.typed += d;
+      document.getElementById("answerBox").textContent = game.typed;
+    }
+
+    function clearAns(){
+      game.typed = "";
+      document.getElementById("answerBox").innerHTML = "&nbsp;";
+    }
+
+    function leavesFor(ms){
+      if(ms < 2500) return 2;
+      if(ms < 4000) return 1;
+      return 0;
+    }
+
+    function applyKoalaBirth(){
+      // her 15 yıldızda 1 koala
+      const shouldKoalas = 1 + Math.floor(state.stars/15);
+      if(state.koalas < shouldKoalas){
+        state.koalas = shouldKoalas;
+
+        // ağaç: 1 ağaç = 4 koala
+        const shouldTrees = Math.max(1, Math.ceil(state.koalas/4));
+        if(state.trees < shouldTrees){
+          state.trees = shouldTrees;
+          return "tree"; // yeni ağaç açıldı
+        }
+        return "koala"; // koala doğdu
       }
-      save(); render();
+      return "none";
     }
 
-    function celebrate(){
-      toast("Orman büyüyor… 🌳");
-      save(); render();
+    function ok(){
+      const ans = Number(game.typed);
+      const correctAns = game.a * game.b;
+      const dt = Date.now() - game.startMs;
+
+      let msg = "";
+      if(Number.isNaN(ans)){
+        gToast("Bir sayı yaz 🙂");
+        return;
+      }
+
+      if(ans === correctAns){
+        state.stars += 1;
+        const l = leavesFor(dt);
+        state.leaves += l;
+
+        if(l === 2) msg = "Çok hızlı! 🍃🍃";
+        else if(l === 1) msg = "Hızlı! 🍃";
+        else msg = "Doğru! 🐨";
+      } else {
+        msg = `Cevap: ${correctAns}`;
+      }
+
+      const birth = applyKoalaBirth();
+      if(birth === "tree") msg = "Orman büyüdü! Yeni ağaç 🌳✨";
+      else if(birth === "koala") msg = "Yeni koala doğdu! 🎉";
+
+      save();
+      renderGameTop();
+      gToast(msg);
+
+      // mini pulse
+      const qc = document.getElementById("qcard");
+      qc.classList.remove("pulse");
+      void qc.offsetWidth;
+      qc.classList.add("pulse");
+
+      // sonraki soru / bitiş
+      game.index += 1;
+      if(game.index >= game.total){
+        // tur bitti
+        setTimeout(() => {
+          backHome();
+          toast("Tur bitti. Orman seni sevdi 🌿");
+        }, 450);
+      } else {
+        setTimeout(() => {
+          nextQuestion();
+        }, 450);
+      }
     }
 
-    // Service worker (offline)
+    // ====== OFFLINE (service worker) ======
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");
     }
 
-    render();
+    // ====== INIT ======
+    renderHome();
+    toast("");
   </script>
 </body>
 </html>
