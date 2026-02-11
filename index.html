@@ -24,7 +24,6 @@
 
     .hidden { display:none; }
 
-    /* Game screen */
     .topbar { display:flex; justify-content:space-between; align-items:center; gap:10px; }
     .topbar .left { display:flex; gap:10px; flex-wrap:wrap; }
     .qcard { background:#fff; border-radius:16px; padding:16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); margin-top:12px; }
@@ -35,17 +34,9 @@
     .keypad { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
     .key { width: calc(33.333% - 6.666px); border:0; border-radius:14px; padding:14px 0; font-size:18px; font-weight:900; background:#fff; }
     .key.alt { background:#EAF2FF; color:#1F6FEB; }
-    .key.wide { width: calc(66.666% - 3.333px); }
 
-    /* Tiny “celebration” */
-    .pulse {
-      animation: pulse 0.5s ease-in-out 2;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.03); }
-      100% { transform: scale(1); }
-    }
+    .pulse { animation: pulse 0.5s ease-in-out 2; }
+    @keyframes pulse { 0% { transform: scale(1);} 50% { transform: scale(1.03);} 100% { transform: scale(1);} }
   </style>
 </head>
 <body>
@@ -107,7 +98,7 @@
       </div>
     </div>
 
-    <!-- FOREST (şimdilik basit) -->
+    <!-- FOREST -->
     <div class="card hidden" id="forest">
       <h1>Orman</h1>
       <p class="sub">Şimdilik basit. Birazdan ağaçları da ekleyeceğiz.</p>
@@ -127,7 +118,8 @@
 
   <script>
     // ====== STATE ======
-    const SKEY="koala_state_v2";
+    // v3: eski cache karışmasın diye key değiştirdim
+    const SKEY="koala_state_v3";
     const state = JSON.parse(localStorage.getItem(SKEY) || '{"stars":0,"leaves":0,"koalas":1,"trees":1}');
     function save(){ localStorage.setItem(SKEY, JSON.stringify(state)); }
 
@@ -174,15 +166,7 @@
     }
 
     // ====== GAME ENGINE (MVP) ======
-    const game = {
-      mode: "speed",
-      total: 10,
-      index: 0,
-      a: 2,
-      b: 2,
-      startMs: 0,
-      typed: ""
-    };
+    const game = { mode:"speed", total:10, index:0, a:2, b:2, startMs:0, typed:"" };
 
     function rand2to9(){ return Math.floor(Math.random()*8)+2; }
 
@@ -234,18 +218,15 @@
     }
 
     function applyKoalaBirth(){
-      // her 15 yıldızda 1 koala
       const shouldKoalas = 1 + Math.floor(state.stars/15);
       if(state.koalas < shouldKoalas){
         state.koalas = shouldKoalas;
-
-        // ağaç: 1 ağaç = 4 koala
         const shouldTrees = Math.max(1, Math.ceil(state.koalas/4));
         if(state.trees < shouldTrees){
           state.trees = shouldTrees;
-          return "tree"; // yeni ağaç açıldı
+          return "tree";
         }
-        return "koala"; // koala doğdu
+        return "koala";
       }
       return "none";
     }
@@ -255,20 +236,17 @@
       const correctAns = game.a * game.b;
       const dt = Date.now() - game.startMs;
 
-      let msg = "";
       if(Number.isNaN(ans)){
         gToast("Bir sayı yaz 🙂");
         return;
       }
 
+      let msg = "";
       if(ans === correctAns){
         state.stars += 1;
         const l = leavesFor(dt);
         state.leaves += l;
-
-        if(l === 2) msg = "Çok hızlı! 🍃🍃";
-        else if(l === 1) msg = "Hızlı! 🍃";
-        else msg = "Doğru! 🐨";
+        msg = (l===2) ? "Çok hızlı! 🍃🍃" : (l===1) ? "Hızlı! 🍃" : "Doğru! 🐨";
       } else {
         msg = `Cevap: ${correctAns}`;
       }
@@ -281,33 +259,23 @@
       renderGameTop();
       gToast(msg);
 
-      // mini pulse
       const qc = document.getElementById("qcard");
-      qc.classList.remove("pulse");
-      void qc.offsetWidth;
-      qc.classList.add("pulse");
+      qc.classList.remove("pulse"); void qc.offsetWidth; qc.classList.add("pulse");
 
-      // sonraki soru / bitiş
       game.index += 1;
       if(game.index >= game.total){
-        // tur bitti
-        setTimeout(() => {
-          backHome();
-          toast("Tur bitti. Orman seni sevdi 🌿");
-        }, 450);
+        setTimeout(() => { backHome(); toast("Tur bitti. Orman seni sevdi 🌿"); }, 450);
       } else {
-        setTimeout(() => {
-          nextQuestion();
-        }, 450);
+        setTimeout(() => { nextQuestion(); }, 450);
       }
     }
 
     // ====== OFFLINE (service worker) ======
+    // v=3 cache kırmak için
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
+      navigator.serviceWorker.register("sw.js?v=3");
     }
 
-    // ====== INIT ======
     renderHome();
     toast("");
   </script>
