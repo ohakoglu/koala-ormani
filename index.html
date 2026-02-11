@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#EAF6FF" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Koala Ormanı</title>
+  <style>
+    body { margin:0; font-family: -apple-system, system-ui, Arial; background:#EAF6FF; color:#0f172a; }
+    .wrap { max-width: 520px; margin: 0 auto; padding: 16px; }
+    .card { background:#fff; border-radius:16px; padding:16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); }
+    h1 { font-size: 22px; margin: 0 0 10px; }
+    .sub { opacity:.75; margin: 0 0 14px; }
+    .btn { width:100%; border:0; border-radius:14px; padding:14px; margin:10px 0; font-size:16px; font-weight:700; background:#1F6FEB; color:#fff; }
+    .btn.secondary { background:#EAF2FF; color:#1F6FEB; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .pill { background:#F1F5F9; padding:10px 12px; border-radius:999px; font-weight:700; }
+    .koalas { font-size: 28px; letter-spacing: 2px; margin-top: 10px; }
+    .toast { margin-top: 10px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Peri ve İpek’in Koala Ormanı</h1>
+      <p class="sub">Bugün 5 dakika. Üzülmek yok. Koalalar büyür.</p>
+
+      <button class="btn" onclick="go('speed')">Hız Turu</button>
+      <button class="btn" onclick="go('target')">Hedef Turu</button>
+      <button class="btn" onclick="go('boss')">Boss</button>
+
+      <button class="btn secondary" onclick="celebrate()">Ormana Bak 🌳</button>
+
+      <div class="row">
+        <div class="pill">⭐ Yıldız: <span id="stars">0</span></div>
+        <div class="pill">🍃 Yaprak: <span id="leaves">0</span></div>
+      </div>
+
+      <div class="koalas" id="koalas">🐨</div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+
+  <script>
+    // Basit veri (şimdilik): localStorage
+    const SKEY="koala_state_v1";
+    const state = JSON.parse(localStorage.getItem(SKEY) || '{"stars":0,"leaves":0,"koalas":1}');
+    function save(){ localStorage.setItem(SKEY, JSON.stringify(state)); }
+
+    function render(){
+      document.getElementById("stars").textContent = state.stars;
+      document.getElementById("leaves").textContent = state.leaves;
+      document.getElementById("koalas").textContent = "🐨".repeat(Math.min(12, state.koalas));
+    }
+
+    function toast(msg){ document.getElementById("toast").textContent = msg; }
+
+    // Şimdilik butonlar demo: yıldız ekler, koala doğurtur
+    function go(mode){
+      state.stars += (mode==="boss"?3:1);
+      state.leaves += 1;
+      // her 15 yıldızda koala +1
+      const should = 1 + Math.floor(state.stars/15);
+      if(state.koalas < should){
+        state.koalas = should;
+        toast("Yeni koala doğdu! 🎉");
+      } else {
+        toast("Devam! 🐾");
+      }
+      save(); render();
+    }
+
+    function celebrate(){
+      toast("Orman büyüyor… 🌳");
+      save(); render();
+    }
+
+    // Service worker (offline)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+
+    render();
+  </script>
+</body>
+</html>
