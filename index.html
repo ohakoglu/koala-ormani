@@ -12,7 +12,7 @@
     .card { background:#fff; border-radius:16px; padding:16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); }
     h1 { font-size: 22px; margin: 0 0 10px; }
     .sub { opacity:.75; margin: 0 0 14px; font-weight:700; }
-    .ver { display:inline-block; margin-left:10px; font-size:12px; font-weight:900; padding:6px 10px; border-radius:999px; background:#EAF2FF; color:#1F6FEB; }
+    .ver { display:inline-block; font-size:12px; font-weight:900; padding:6px 10px; border-radius:999px; background:#EAF2FF; color:#1F6FEB; }
 
     .btn { width:100%; border:0; border-radius:14px; padding:14px; margin:10px 0; font-size:16px; font-weight:900; background:#1F6FEB; color:#fff; }
     .btn.secondary { background:#EAF2FF; color:#1F6FEB; }
@@ -44,6 +44,7 @@
       display:flex; align-items:center; justify-content:center;
       box-shadow: 0 6px 16px rgba(0,0,0,.08);
       overflow:hidden;
+      user-select:none;
     }
     .koala::before {
       content:"";
@@ -60,7 +61,7 @@
       font-size: 16px;
       font-weight: 900;
     }
-    .acc { position:absolute; right: 6px; bottom: 6px; font-size: 14px; }
+    .acc { position:absolute; right: 6px; bottom: 6px; font-size: 14px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.15)); }
     .lvl { position:absolute; left: 6px; bottom: 6px; font-size: 12px; opacity: .9; }
 
     /* Forest */
@@ -81,6 +82,48 @@
       display:flex; align-items:center; justify-content:center;
       border: 1px dashed rgba(15,23,42,.14);
     }
+
+    /* Overlay */
+    .overlay {
+      position:fixed; inset:0;
+      background: rgba(15,23,42,.38);
+      display:none;
+      align-items:center; justify-content:center;
+      padding: 18px;
+      z-index: 9999;
+    }
+    .overlay.show { display:flex; }
+    .modal {
+      width: min(520px, 100%);
+      background:#fff;
+      border-radius:18px;
+      padding:16px;
+      box-shadow: 0 16px 60px rgba(0,0,0,.25);
+      position:relative;
+      overflow:hidden;
+    }
+    .modal h2 { margin:0 0 6px; font-size:18px; }
+    .modal p { margin:0 0 12px; opacity:.82; font-weight:800; }
+    .bigRow { display:flex; gap:12px; flex-wrap:wrap; margin-top: 10px; }
+
+    .spark {
+      position:absolute; inset:-40px;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255,212,122,.55) 0 7px, transparent 8px),
+        radial-gradient(circle at 70% 30%, rgba(122,214,161,.55) 0 7px, transparent 8px),
+        radial-gradient(circle at 40% 75%, rgba(200,185,255,.55) 0 7px, transparent 8px),
+        radial-gradient(circle at 85% 70%, rgba(234,246,255,.95) 0 7px, transparent 8px);
+      opacity:.95;
+      animation: floaty 2.0s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes floaty { 0%{ transform: translateY(0);} 50%{ transform: translateY(10px);} 100%{ transform: translateY(0);} }
+
+    .bounce { animation: bounce .75s ease-in-out 2; }
+    @keyframes bounce { 0%{ transform: translateY(0);} 50%{ transform: translateY(-10px);} 100%{ transform: translateY(0);} }
+
+    .pulse { animation: pulse .5s ease-in-out 2; }
+    @keyframes pulse { 0%{ transform: scale(1);} 50%{ transform: scale(1.03);} 100%{ transform: scale(1);} }
   </style>
 </head>
 <body>
@@ -88,7 +131,11 @@
 
     <!-- HOME -->
     <div class="card" id="home">
-      <h1>Peri ve İpek’in Koala Ormanı <span class="ver">v6</span></h1>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <h1 style="margin:0;">Peri ve İpek’in Koala Ormanı</h1>
+        <span class="ver">v8</span>
+      </div>
+
       <p class="sub">Bugün 5 dakika. Üzülmek yok. Koalalar büyür.</p>
 
       <button class="btn" onclick="startMode('speed')">Hız Turu</button>
@@ -101,6 +148,7 @@
         <div class="pill">⭐ <span id="stars">0</span></div>
         <div class="pill">🍃 <span id="leaves">0</span></div>
         <div class="pill">🌳 <span id="trees">1</span></div>
+        <div class="pill">✨ XP: <span id="xp">0</span></div>
       </div>
 
       <div class="koalaStrip" id="homeKoalas"></div>
@@ -113,12 +161,13 @@
         <div class="left">
           <div class="pill">⭐ <span id="gStars">0</span></div>
           <div class="pill">🍃 <span id="gLeaves">0</span></div>
+          <div class="pill">✨ <span id="gXp">0</span></div>
           <div class="pill"><span id="gIndex">1</span>/<span id="gTotal">10</span></div>
         </div>
         <button class="btn ghost" style="width:auto; margin:0; padding:10px 12px;" onclick="backHome()">Geri</button>
       </div>
 
-      <div class="qcard">
+      <div class="qcard" id="qcard">
         <p class="hint" id="modeText">Hız Turu</p>
         <div class="q" id="question">2 × 2 = ?</div>
         <div class="ans" id="answerBox">&nbsp;</div>
@@ -145,8 +194,12 @@
 
     <!-- FOREST -->
     <div class="card hidden" id="forest">
-      <h1>Orman <span class="ver">v6</span></h1>
-      <p class="sub">Koalalar ağaçlara yerleşir.</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <h1 style="margin:0;">Orman</h1>
+        <span class="ver">lvl</span>
+      </div>
+
+      <p class="sub">Koalalar büyür: 🌱 yavru → 🌿 genç → 🍃 usta → ✨ bilge</p>
 
       <div class="row">
         <div class="pill">🌳 <span id="fTrees">1</span></div>
@@ -161,12 +214,38 @@
 
   </div>
 
-  <script>
-    // ---------- Basit, sağlam state ----------
-    const SKEY = "koala_state_v6";
+  <!-- Overlay -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="spark"></div>
+      <h2 id="ovTitle">🎉</h2>
+      <p id="ovText">...</p>
+      <div class="bigRow" id="ovRow"></div>
+      <button class="btn" onclick="closeOverlay()">Tamam</button>
+    </div>
+  </div>
 
+  <script>
+    const SKEY="koala_state_v8";
+
+    // --- varyasyon ---
     const PALETTES = ["#C8B9FF","#BFE8C6","#A7D8FF","#FFD6E7","#D3D8E6","#FFE7B0","#B7F0FF","#D9FFE1"];
     const ACCESSORIES = ["", "🌿", "🌸", "🧣", "⭐", "👑"];
+
+    // nadir hayvanlar (çok nadir: %2)
+    const RARE = [
+      { name:"Zümrüt Tilki", face:"🦊", bg:"#BFE8C6" },
+      { name:"Ay Baykuşu", face:"🦉", bg:"#A7D8FF" },
+      { name:"Ay Işığı Panda", face:"🐼", bg:"#D3D8E6" }
+    ];
+
+    // mastery havuzu: 2..9
+    const FACTS = [];
+    for(let a=2;a<=9;a++){
+      for(let b=2;b<=9;b++){
+        FACTS.push({a,b, key: a+"x"+b});
+      }
+    }
 
     function rng(seed){ let x = Math.sin(seed) * 10000; return x - Math.floor(x); }
 
@@ -174,57 +253,77 @@
       const p = Math.floor(rng(seed) * PALETTES.length);
       const a = Math.floor(rng(seed*7.1) * ACCESSORIES.length);
       const e = 1 + Math.floor(rng(seed*11.7) * 3);
-      return { id: String(seed) + "_" + Math.floor(rng(seed*3.3)*100000), palette:p, accessory:a, eyes:e, lvl:1 };
+      return { kind:"koala", id:String(seed)+"_"+Math.floor(rng(seed*3.3)*100000), palette:p, accessory:a, eyes:e, lvl:1 };
     }
+    function makeRare(seed){
+      const r = RARE[Math.floor(rng(seed*9.3) * RARE.length)];
+      return { kind:"rare", id:"r_"+String(seed)+"_"+Math.floor(rng(seed*5.5)*100000), name:r.name, face:r.face, bg:r.bg, lvl:1 };
+    }
+
     function eyesChar(e){ return e===1 ? "•ᴥ•" : e===2 ? "˘ᴥ˘" : "•⩊•"; }
     function lvlEmoji(l){ return l===1 ? "🌱" : l===2 ? "🌿" : l===3 ? "🍃" : "✨"; }
 
     function koalaCard(k, big=false){
-      const bg = PALETTES[k.palette] || PALETTES[0];
-      const acc = ACCESSORIES[k.accessory] || "";
       const size = big ? 62 : 52;
-
       const el = document.createElement("div");
       el.className = "koala";
-      el.style.background = bg;
-      el.style.width = size + "px";
-      el.style.height = size + "px";
+      el.style.width = size+"px";
+      el.style.height = size+"px";
 
       const face = document.createElement("div");
       face.className = "koFace";
       face.style.fontSize = big ? "18px" : "16px";
-      face.textContent = eyesChar(k.eyes);
 
       const accEl = document.createElement("div");
       accEl.className = "acc";
-      accEl.textContent = acc;
+
+      if(k.kind === "rare"){
+        el.style.background = k.bg || "#EAF2FF";
+        face.textContent = k.face;
+        accEl.textContent = "✨";
+      } else {
+        el.style.background = PALETTES[k.palette] || PALETTES[0];
+        face.textContent = eyesChar(k.eyes);
+        accEl.textContent = ACCESSORIES[k.accessory] || "";
+      }
 
       const lvlEl = document.createElement("div");
       lvlEl.className = "lvl";
       lvlEl.textContent = lvlEmoji(k.lvl);
 
       el.appendChild(face);
-      if(acc) el.appendChild(accEl);
+      if(accEl.textContent) el.appendChild(accEl);
       el.appendChild(lvlEl);
       return el;
     }
 
+    // --- state ---
     function loadState(){
       try{
         const raw = localStorage.getItem(SKEY);
         if(raw) return JSON.parse(raw);
       } catch {}
-      return { stars:0, leaves:0, koalas:[makeKoala(Date.now())] };
+      // mastery başlangıç
+      const mastery = {};
+      FACTS.forEach(f => mastery[f.key] = { seen:0, correct:0, wrong:0, bestMs:null, streak:0 });
+      return { stars:0, leaves:0, xp:0, koalas:[makeKoala(Date.now())], mastery };
     }
 
     const state = loadState();
-    if(!Array.isArray(state.koalas) || state.koalas.length === 0){
-      state.koalas = [makeKoala(Date.now())];
+    if(!Array.isArray(state.koalas) || state.koalas.length===0) state.koalas = [makeKoala(Date.now())];
+    if(typeof state.xp !== "number") state.xp = 0;
+    if(!state.mastery){
+      state.mastery = {};
+      FACTS.forEach(f => state.mastery[f.key] = { seen:0, correct:0, wrong:0, bestMs:null, streak:0 });
+    } else {
+      // eksik keyleri tamamla
+      FACTS.forEach(f => { if(!state.mastery[f.key]) state.mastery[f.key] = { seen:0, correct:0, wrong:0, bestMs:null, streak:0 }; });
     }
-    state.trees = Math.max(1, Math.ceil(state.koalas.length / 4));
+
+    function treesNow(){ return Math.max(1, Math.ceil(state.koalas.length/4)); }
 
     function save(){
-      state.trees = Math.max(1, Math.ceil(state.koalas.length / 4));
+      state.trees = treesNow();
       try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch {}
     }
 
@@ -240,7 +339,8 @@
     function renderHome(){
       $("stars").textContent = state.stars;
       $("leaves").textContent = state.leaves;
-      $("trees").textContent = state.trees;
+      $("trees").textContent = treesNow();
+      $("xp").textContent = state.xp;
 
       const strip = $("homeKoalas");
       strip.innerHTML = "";
@@ -249,21 +349,15 @@
       }
     }
 
-    function renderGameTop(){
-      $("gStars").textContent = state.stars;
-      $("gLeaves").textContent = state.leaves;
-      $("gIndex").textContent = game.index + 1;
-      $("gTotal").textContent = game.total;
-    }
-
     function renderForest(){
-      $("fTrees").textContent = state.trees;
+      const trees = treesNow();
+      $("fTrees").textContent = trees;
       $("fKoalas").textContent = state.koalas.length;
 
       const grid = $("forestGrid");
       grid.innerHTML = "";
 
-      for(let t=0; t<state.trees; t++){
+      for(let t=0; t<trees; t++){
         const tree = document.createElement("div");
         tree.className = "tree";
 
@@ -282,16 +376,74 @@
           if(state.koalas[idx]) slot.appendChild(koalaCard(state.koalas[idx], true));
           slots.appendChild(slot);
         }
-
         tree.appendChild(slots);
         grid.appendChild(tree);
       }
     }
 
-    // ---------- Oyun ----------
-    const game = { mode:"speed", total:10, index:0, a:2, b:2, startMs:0, typed:"" };
+    // --- overlay ---
+    function openOverlay(titleText, bodyText){
+      $("ovTitle").textContent = titleText;
+      $("ovText").textContent = bodyText;
+      const row = $("ovRow");
+      row.innerHTML = "";
 
-    function rand2to9(){ return Math.floor(Math.random()*8)+2; }
+      const start = Math.max(0, state.koalas.length-4);
+      for(let i=start; i<state.koalas.length; i++){
+        const el = koalaCard(state.koalas[i], true);
+        el.classList.add("bounce");
+        row.appendChild(el);
+      }
+
+      $("overlay").classList.add("show");
+    }
+
+    window.closeOverlay = function(){
+      $("overlay").classList.remove("show");
+    };
+
+    // --- mastery seçim ---
+    function weightForFact(f){
+      const m = state.mastery[f.key];
+      const seen = m.seen || 0;
+      const wrong = m.wrong || 0;
+      const correct = m.correct || 0;
+      const acc = (seen>0) ? (correct/seen) : 0;
+
+      // yanlışlar ağırlığı arttırır, az görülmüşse arttırır
+      // doğru oranı yükseldikçe ağırlık azalır
+      let w = 1;
+      w += wrong * 1.4;
+      w += (seen < 4) ? 2.0 : (seen < 10) ? 1.0 : 0;
+      w += (acc < 0.6) ? 1.2 : (acc < 0.8) ? 0.6 : 0;
+
+      // üst üste doğru (streak) biraz azaltır
+      w -= Math.min(1.2, (m.streak||0) * 0.25);
+
+      // minimum
+      if(w < 0.2) w = 0.2;
+      return w;
+    }
+
+    function pickFact(){
+      // roulette wheel
+      let total = 0;
+      const weights = FACTS.map(f => {
+        const w = weightForFact(f);
+        total += w;
+        return w;
+      });
+      let r = Math.random() * total;
+      for(let i=0;i<FACTS.length;i++){
+        r -= weights[i];
+        if(r <= 0) return FACTS[i];
+      }
+      return FACTS[FACTS.length-1];
+    }
+
+    // --- game ---
+    const game = { mode:"speed", total:10, index:0, a:2, b:2, startMs:0, typed:"", key:"2x2" };
+
     function cfg(mode){
       if(mode==="speed") return { total: 12, label: "Hız Turu" };
       if(mode==="target") return { total: 10, label: "Hedef Turu" };
@@ -304,24 +456,89 @@
       $("answerBox").innerHTML = "&nbsp;";
       $("gToast").textContent = "";
 
-      game.a = rand2to9();
-      game.b = rand2to9();
+      const f = pickFact();
+      game.a = f.a;
+      game.b = f.b;
+      game.key = f.key;
+
       $("question").textContent = `${game.a} × ${game.b} = ?`;
       game.startMs = Date.now();
-      renderGameTop();
+
+      $("gStars").textContent = state.stars;
+      $("gLeaves").textContent = state.leaves;
+      $("gXp").textContent = state.xp;
+      $("gIndex").textContent = game.index + 1;
+      $("gTotal").textContent = game.total;
+
+      // seen++
+      const m = state.mastery[game.key];
+      m.seen = (m.seen||0) + 1;
+      save();
     }
 
-    function ensureKoalas(){
-      const should = 1 + Math.floor(state.stars / 15);
-      let born = 0;
-      while(state.koalas.length < should){
-        state.koalas.push(makeKoala(Date.now() + state.koalas.length*999 + Math.floor(Math.random()*9999)));
-        born++;
+    // XP ve büyüme
+    const XP_PER_LEVEL = 20;   // her 20 XP’de seviye
+    const MAX_LVL = 4;
+
+    function levelUpOne(){
+      // en düşük level koalayı yükselt
+      let idx = -1;
+      let bestLvl = 999;
+      for(let i=0;i<state.koalas.length;i++){
+        const k = state.koalas[i];
+        if((k.lvl||1) < bestLvl){
+          bestLvl = (k.lvl||1);
+          idx = i;
+        }
       }
-      return born;
+      if(idx >= 0){
+        const k = state.koalas[idx];
+        if((k.lvl||1) < MAX_LVL){
+          k.lvl = (k.lvl||1) + 1;
+          return k;
+        }
+      }
+      return null;
     }
 
-    // ---------- GLOBAL (iOS için net) ----------
+    function addXP(amount){
+      let msg = null;
+      state.xp += amount;
+
+      // birden fazla level atlama ihtimaline karşı döngü
+      while(state.xp >= XP_PER_LEVEL){
+        state.xp -= XP_PER_LEVEL;
+        const leveled = levelUpOne();
+        if(leveled){
+          msg = "Seviye atladı! " + lvlEmoji(leveled.lvl);
+        }
+      }
+      return msg;
+    }
+
+    // doğumlar
+    function ensureBirths(){
+      const should = 1 + Math.floor(state.stars / 15);
+      let born = null;
+      let any = 0;
+
+      while(state.koalas.length < should){
+        const seed = Date.now() + state.koalas.length*999 + Math.floor(Math.random()*9999);
+        const rare = Math.random() < 0.02; // %2
+        const baby = rare ? makeRare(seed) : makeKoala(seed);
+        state.koalas.push(baby);
+        born = baby;
+        any++;
+      }
+
+      const oldTrees = state.trees || 1;
+      const newTrees = treesNow();
+      state.trees = newTrees;
+
+      return { any, born, tree: newTrees > oldTrees };
+    }
+
+    // --- global fonksiyonlar ---
     window.startMode = function(mode){
       const c = cfg(mode);
       game.mode = mode;
@@ -362,18 +579,66 @@
       const correct = game.a * game.b;
       const dt = Date.now() - game.startMs;
 
+      const m = state.mastery[game.key];
+
+      let baseMsg = "";
+      let xpGain = 0;
+
       if(ans === correct){
         state.stars += 1;
         const l = leavesFor(dt);
         state.leaves += l;
-        $("gToast").textContent = l===2 ? "Çok hızlı! 🍃🍃" : l===1 ? "Hızlı! 🍃" : "Doğru! 🐨";
+
+        // mastery
+        m.correct = (m.correct||0) + 1;
+        m.streak = (m.streak||0) + 1;
+        if(m.bestMs === null || dt < m.bestMs) m.bestMs = dt;
+
+        // XP: doğruya 2, hızlıysa +1/+2
+        xpGain = 2 + (l===2 ? 2 : l===1 ? 1 : 0);
+
+        baseMsg = l===2 ? "Çok hızlı! 🍃🍃" : l===1 ? "Hızlı! 🍃" : "Doğru! 🐨";
       } else {
-        $("gToast").textContent = `Cevap: ${correct}`;
+        // mastery
+        m.wrong = (m.wrong||0) + 1;
+        m.streak = 0;
+
+        baseMsg = `Cevap: ${correct}`;
+        xpGain = 0; // yanlışta XP yok (üzücü de yok, sadece bilgi)
       }
 
-      ensureKoalas();
+      // XP ve seviye
+      let lvlMsg = null;
+      if(xpGain > 0){
+        lvlMsg = addXP(xpGain);
+      }
+
+      // doğum / yeni ağaç
+      const births = ensureBirths();
+
       save();
-      renderGameTop();
+      $("gStars").textContent = state.stars;
+      $("gLeaves").textContent = state.leaves;
+      $("gXp").textContent = state.xp;
+
+      const qc = $("qcard");
+      qc.classList.remove("pulse"); void qc.offsetWidth; qc.classList.add("pulse");
+
+      // overlay öncelik sırası: yeni ağaç > nadir > yeni koala > seviye atlama
+      if(births.any > 0){
+        if(births.tree){
+          openOverlay("Yeni ağaç açıldı! 🌳✨", "Orman genişledi. Koalalar topluca sevindi!");
+        } else if(births.born && births.born.kind==="rare"){
+          openOverlay("Nadir bir misafir geldi! ✨", births.born.name + " ormana uğradı.");
+        } else {
+          openOverlay("Yeni koala doğdu! 🎉", "Hoş geldin küçük koala!");
+        }
+      } else if(lvlMsg){
+        openOverlay("Koala büyüdü! ✨", lvlMsg);
+      }
+
+      // toast
+      $("gToast").textContent = baseMsg + (xpGain>0 ? `  +${xpGain}XP` : "");
 
       game.index += 1;
       if(game.index >= game.total){
@@ -384,10 +649,9 @@
     };
 
     // init
+    state.trees = treesNow();
     save();
     renderHome();
-
-    // Basit “JS çalışıyor” göstergesi
     $("toast").textContent = "Hazır ✅";
   </script>
 </body>
