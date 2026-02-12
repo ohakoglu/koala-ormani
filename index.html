@@ -1,175 +1,458 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Koala Ormanı</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#EAF6FF" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Koala Ormanı</title>
+  <style>
+    body{margin:0;font-family:-apple-system,system-ui,Arial;background:#EAF6FF;color:#0f172a}
+    .wrap{max-width:520px;margin:0 auto;padding:16px}
+    .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+    h1{font-size:22px;margin:0 0 10px}
+    .sub{opacity:.75;margin:0 0 14px;font-weight:700}
+    .ver{display:inline-block;font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:#EAF2FF;color:#1F6FEB}
 
-<style>
-body{margin:0;font-family:-apple-system,system-ui,Arial;background:#EAF6FF;color:#0f172a}
-.wrap{max-width:520px;margin:0 auto;padding:16px}
-.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
-h1{font-size:22px;margin:0 0 10px}
-.sub{opacity:.7;margin:0 0 14px;font-weight:700}
-.ver{font-size:12px;font-weight:900;background:#EAF2FF;padding:6px 10px;border-radius:999px}
+    .btn{width:100%;border:0;border-radius:14px;padding:14px;margin:10px 0;font-size:16px;font-weight:900;background:#1F6FEB;color:#fff}
+    .btn.secondary{background:#EAF2FF;color:#1F6FEB}
+    .btn.ghost{background:#F1F5F9;color:#0f172a}
 
-.btn{width:100%;border:0;border-radius:14px;padding:14px;margin:10px 0;font-size:16px;font-weight:900;background:#1F6FEB;color:#fff}
-.btn.secondary{background:#EAF2FF;color:#1F6FEB}
-.btn.ghost{background:#F1F5F9;color:#0f172a}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .pill{background:#F1F5F9;padding:10px 12px;border-radius:999px;font-weight:900}
+    .toast{margin-top:10px;font-weight:900;min-height:24px}
+    .hidden{display:none}
 
-.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.pill{background:#F1F5F9;padding:10px 12px;border-radius:999px;font-weight:900}
+    /* GAME */
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .topbar .left{display:flex;gap:10px;flex-wrap:wrap}
+    .qcard{background:#fff;border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);margin-top:12px}
+    .q{font-size:38px;font-weight:900;text-align:center;margin:6px 0 8px}
+    .hint{text-align:center;opacity:.75;margin:0 0 10px;font-weight:800}
+    .ans{font-size:28px;font-weight:900;text-align:center;background:#F8FAFC;border-radius:14px;padding:12px;min-height:38px}
 
-.hidden{display:none}
+    .keypad{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    .key{width:calc(33.333% - 6.666px);border:0;border-radius:14px;padding:14px 0;font-size:18px;font-weight:900;background:#fff}
+    .key.alt{background:#EAF2FF;color:#1F6FEB}
 
-/* KOALA */
-.koala{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:20px}
+    .pulse{animation:pulse .5s ease-in-out 2}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
 
-/* FOREST */
-.forestGrid{margin-top:12px}
+    /* KOALA cards */
+    .koalaStrip{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .koala{
+      width:52px;height:52px;border-radius:16px;position:relative;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 16px rgba(0,0,0,.08);overflow:hidden;user-select:none
+    }
+    .koala::before{
+      content:"";position:absolute;width:18px;height:18px;border-radius:10px;left:6px;top:6px;
+      background:rgba(255,255,255,.35);box-shadow:22px 0 0 rgba(255,255,255,.35)
+    }
+    .koFace{
+      width:26px;height:26px;border-radius:12px;background:rgba(255,255,255,.35);
+      display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900
+    }
+    .acc{position:absolute;right:6px;bottom:6px;font-size:14px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+    .lvl{position:absolute;left:6px;bottom:6px;font-size:12px;opacity:.9}
 
-/* OVERLAY */
-#overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.5);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:9999;
-}
-#overlayBox{
-background:#fff;
-padding:20px;
-border-radius:18px;
-width:90%;
-max-width:400px;
-text-align:center;
-}
-</style>
+    /* FOREST */
+    .forestGrid{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+    .tree{
+      background:linear-gradient(180deg, rgba(123,228,149,.25), rgba(255,255,255,.95));
+      border-radius:18px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,.06);
+      border:1px solid rgba(15,23,42,.06)
+    }
+    .treeHead{display:flex;justify-content:space-between;align-items:center;font-weight:900;margin-bottom:10px}
+    .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .slot{
+      height:62px;border-radius:16px;background:#F8FAFC;display:flex;align-items:center;justify-content:center;
+      border:1px dashed rgba(15,23,42,.14)
+    }
+
+    /* OVERLAY (v9-style: guaranteed) */
+    #overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.5);
+      display:none;align-items:center;justify-content:center;z-index:9999;padding:18px
+    }
+    #overlayBox{
+      background:#fff;padding:18px;border-radius:18px;width:min(520px,100%);
+      box-shadow:0 16px 60px rgba(0,0,0,.25);text-align:center;position:relative;overflow:hidden
+    }
+    #overlayBox h2{margin:0 0 6px;font-size:18px}
+    #overlayBox p{margin:0 0 12px;opacity:.82;font-weight:800}
+    .ovRow{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:10px 0 12px}
+  </style>
 </head>
-
 <body>
-<div class="wrap">
+  <div class="wrap">
 
-<div class="card" id="home">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<h1 style="margin:0">Peri ve İpek’in Koala Ormanı</h1>
-<span class="ver">v9</span>
-</div>
+    <!-- HOME -->
+    <div class="card" id="home">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <h1 style="margin:0;">Peri ve İpek’in Koala Ormanı</h1>
+        <span class="ver">v10</span>
+      </div>
 
-<p class="sub">Bugün 5 dakika. Üzülmek yok. Koalalar büyür.</p>
+      <p class="sub">Bugün 5 dakika. Üzülmek yok. Koalalar büyür.</p>
 
-<button class="btn" onclick="startGame()">Başla</button>
-<button class="btn secondary" onclick="showForest()">Ormana Bak</button>
+      <button class="btn" onclick="startMode('speed')">Hız Turu</button>
+      <button class="btn" onclick="startMode('target')">Hedef Turu</button>
+      <button class="btn" onclick="startMode('boss')">Boss</button>
 
-<div class="row">
-<div class="pill">⭐ <span id="stars">0</span></div>
-<div class="pill">🌳 <span id="trees">1</span></div>
-</div>
+      <button class="btn secondary" onclick="showForest()">Ormana Bak 🌳</button>
 
-<div id="homeKoalas"></div>
-</div>
+      <div class="row">
+        <div class="pill">⭐ <span id="stars">0</span></div>
+        <div class="pill">🍃 <span id="leaves">0</span></div>
+        <div class="pill">🌳 <span id="trees">1</span></div>
+      </div>
 
-<div class="card hidden" id="game">
-<h1 id="question">2 × 2 = ?</h1>
-<input id="answer" style="width:100%;padding:10px;font-size:20px"/>
-<button class="btn" onclick="check()">OK</button>
-<button class="btn ghost" onclick="backHome()">Geri</button>
-</div>
+      <div class="koalaStrip" id="homeKoalas"></div>
+      <div class="toast" id="toast"></div>
+    </div>
 
-<div class="card hidden" id="forest">
-<h1>Orman</h1>
-<div id="forestGrid"></div>
-<button class="btn ghost" onclick="backHome()">Geri</button>
-</div>
+    <!-- GAME -->
+    <div id="game" class="hidden">
+      <div class="topbar">
+        <div class="left">
+          <div class="pill">⭐ <span id="gStars">0</span></div>
+          <div class="pill">🍃 <span id="gLeaves">0</span></div>
+          <div class="pill"><span id="gIndex">1</span>/<span id="gTotal">10</span></div>
+        </div>
+        <button class="btn ghost" style="width:auto;margin:0;padding:10px 12px;" onclick="backHome()">Geri</button>
+      </div>
 
-</div>
+      <div class="qcard" id="qcard">
+        <p class="hint" id="modeText">Hız Turu</p>
+        <div class="q" id="question">2 × 2 = ?</div>
+        <div class="ans" id="answerBox">&nbsp;</div>
 
-<div id="overlay">
-<div id="overlayBox">
-<h2 id="ovTitle"></h2>
-<p id="ovText"></p>
-<button class="btn" onclick="closeOverlay()">Tamam</button>
-</div>
-</div>
+        <div class="keypad">
+          <button class="key" onclick="tap('1')">1</button>
+          <button class="key" onclick="tap('2')">2</button>
+          <button class="key" onclick="tap('3')">3</button>
+          <button class="key" onclick="tap('4')">4</button>
+          <button class="key" onclick="tap('5')">5</button>
+          <button class="key" onclick="tap('6')">6</button>
+          <button class="key" onclick="tap('7')">7</button>
+          <button class="key" onclick="tap('8')">8</button>
+          <button class="key" onclick="tap('9')">9</button>
+
+          <button class="key alt" onclick="clearAns()">Sil</button>
+          <button class="key" onclick="tap('0')">0</button>
+          <button class="key alt" onclick="ok()">OK</button>
+        </div>
+
+        <div class="toast" id="gToast"></div>
+      </div>
+    </div>
+
+    <!-- FOREST -->
+    <div class="card hidden" id="forest">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <h1 style="margin:0;">Orman</h1>
+        <span class="ver">yuvalı</span>
+      </div>
+
+      <p class="sub">Her ağaçta 4 yuva. Koalalar artınca orman genişler.</p>
+
+      <div class="row">
+        <div class="pill">🌳 <span id="fTrees">1</span></div>
+        <div class="pill">🐨 <span id="fKoalas">1</span></div>
+      </div>
+
+      <div class="forestGrid" id="forestGrid"></div>
+
+      <div class="toast" id="fToast"></div>
+      <button class="btn ghost" onclick="backHome()">Geri</button>
+    </div>
+
+  </div>
+
+  <!-- OVERLAY -->
+  <div id="overlay">
+    <div id="overlayBox">
+      <h2 id="ovTitle">🎉</h2>
+      <p id="ovText">...</p>
+      <div class="ovRow" id="ovRow"></div>
+      <button class="btn" onclick="closeOverlay()">Tamam</button>
+    </div>
+  </div>
 
 <script>
-const SKEY="koala_state_v9"
+/* ========= STATE ========= */
+const SKEY="koala_state_v10";
 
-function load(){
-try{
-const r=localStorage.getItem(SKEY)
-if(r)return JSON.parse(r)
-}catch{}
-return{stars:0,koalas:1}
+const PALETTES=["#C8B9FF","#BFE8C6","#A7D8FF","#FFD6E7","#D3D8E6","#FFE7B0","#B7F0FF","#D9FFE1"];
+const ACCESSORIES=["","🌿","🌸","🧣","⭐","👑"];
+const RARE=[
+  {name:"Zümrüt Tilki", face:"🦊", bg:"#BFE8C6"},
+  {name:"Ay Baykuşu", face:"🦉", bg:"#A7D8FF"},
+  {name:"Ay Işığı Panda", face:"🐼", bg:"#D3D8E6"}
+];
+
+function rng(seed){ let x=Math.sin(seed)*10000; return x-Math.floor(x); }
+function eyesChar(e){ return e===1?"•ᴥ•":e===2?"˘ᴥ˘":"•⩊•"; }
+function lvlEmoji(l){ return l===1?"🌱":l===2?"🌿":l===3?"🍃":"✨"; }
+
+function makeKoala(seed){
+  const p=Math.floor(rng(seed)*PALETTES.length);
+  const a=Math.floor(rng(seed*7.1)*ACCESSORIES.length);
+  const e=1+Math.floor(rng(seed*11.7)*3);
+  return {kind:"koala", id:String(seed)+"_"+Math.floor(rng(seed*3.3)*100000), palette:p, accessory:a, eyes:e, lvl:1};
 }
-const state=load()
-
-function save(){localStorage.setItem(SKEY,JSON.stringify(state))}
-
-function render(){
-document.getElementById("stars").textContent=state.stars
-document.getElementById("trees").textContent=Math.ceil(state.koalas/4)
-document.getElementById("homeKoalas").innerHTML="🐨".repeat(state.koalas)
+function makeRare(seed){
+  const r=RARE[Math.floor(rng(seed*9.3)*RARE.length)];
+  return {kind:"rare", id:"r_"+String(seed)+"_"+Math.floor(rng(seed*5.5)*100000), name:r.name, face:r.face, bg:r.bg, lvl:1};
 }
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(SKEY);
+    if(raw) return JSON.parse(raw);
+  }catch{}
+  return {stars:0, leaves:0, koalas:[makeKoala(Date.now())], trees:1};
+}
+const state=loadState();
+if(!Array.isArray(state.koalas) || state.koalas.length===0) state.koalas=[makeKoala(Date.now())];
+if(typeof state.stars!=="number") state.stars=0;
+if(typeof state.leaves!=="number") state.leaves=0;
+
+function treesNow(){ return Math.max(1, Math.ceil(state.koalas.length/4)); }
+function save(){ state.trees=treesNow(); localStorage.setItem(SKEY, JSON.stringify(state)); }
+function $(id){ return document.getElementById(id); }
 
 function show(id){
-home.classList.add("hidden")
-game.classList.add("hidden")
-forest.classList.add("hidden")
-document.getElementById(id).classList.remove("hidden")
+  $("home").classList.add("hidden");
+  $("game").classList.add("hidden");
+  $("forest").classList.add("hidden");
+  $(id).classList.remove("hidden");
 }
 
-window.startGame=function(){
-show("game")
-newQuestion()
+/* ========= KOALA UI ========= */
+function koalaCard(k, big=false){
+  const size=big?62:52;
+  const el=document.createElement("div");
+  el.className="koala";
+  el.style.width=size+"px";
+  el.style.height=size+"px";
+
+  const face=document.createElement("div");
+  face.className="koFace";
+  face.style.fontSize=big?"18px":"16px";
+
+  const acc=document.createElement("div");
+  acc.className="acc";
+
+  if(k.kind==="rare"){
+    el.style.background = k.bg || "#EAF2FF";
+    face.textContent = k.face;
+    acc.textContent = "✨";
+  }else{
+    el.style.background = PALETTES[k.palette] || PALETTES[0];
+    face.textContent = eyesChar(k.eyes);
+    acc.textContent = ACCESSORIES[k.accessory] || "";
+  }
+
+  const lvl=document.createElement("div");
+  lvl.className="lvl";
+  lvl.textContent = lvlEmoji(k.lvl||1);
+
+  el.appendChild(face);
+  if(acc.textContent) el.appendChild(acc);
+  el.appendChild(lvl);
+  return el;
 }
+
+function renderHome(){
+  $("stars").textContent=state.stars;
+  $("leaves").textContent=state.leaves;
+  $("trees").textContent=treesNow();
+
+  const strip=$("homeKoalas");
+  strip.innerHTML="";
+  for(let i=0;i<Math.min(8, state.koalas.length); i++){
+    strip.appendChild(koalaCard(state.koalas[i], false));
+  }
+}
+
+/* ========= FOREST ========= */
+function renderForest(){
+  const trees=treesNow();
+  $("fTrees").textContent=trees;
+  $("fKoalas").textContent=state.koalas.length;
+
+  const grid=$("forestGrid");
+  grid.innerHTML="";
+
+  for(let t=0;t<trees;t++){
+    const tree=document.createElement("div");
+    tree.className="tree";
+
+    const head=document.createElement("div");
+    head.className="treeHead";
+    head.innerHTML=`<span>Ağaç ${t+1}</span><span>${t*4+1}–${Math.min((t+1)*4, state.koalas.length)}</span>`;
+    tree.appendChild(head);
+
+    const slots=document.createElement("div");
+    slots.className="slots";
+    for(let s=0;s<4;s++){
+      const idx=t*4+s;
+      const slot=document.createElement("div");
+      slot.className="slot";
+      if(state.koalas[idx]) slot.appendChild(koalaCard(state.koalas[idx], true));
+      slots.appendChild(slot);
+    }
+    tree.appendChild(slots);
+    grid.appendChild(tree);
+  }
+}
+
+/* ========= OVERLAY (GUARANTEED) ========= */
+function openOverlay(title, text){
+  $("ovTitle").textContent=title;
+  $("ovText").textContent=text;
+
+  const row=$("ovRow");
+  row.innerHTML="";
+  const start=Math.max(0, state.koalas.length-4);
+  for(let i=start;i<state.koalas.length;i++){
+    row.appendChild(koalaCard(state.koalas[i], true));
+  }
+
+  $("overlay").style.display="flex";
+}
+window.closeOverlay=function(){ $("overlay").style.display="none"; };
+
+/* ========= GAME ========= */
+const game={ mode:"speed", total:10, index:0, a:2, b:2, typed:"", startMs:0 };
+
+function cfg(mode){
+  if(mode==="speed") return {total:12, label:"Hız Turu"};
+  if(mode==="target") return {total:10, label:"Hedef Turu"};
+  return {total:20, label:"Boss"};
+}
+function leavesFor(ms){ return ms<2500?2:ms<4000?1:0; }
+function rand2to9(){ return Math.floor(Math.random()*8)+2; }
+
+function nextQ(){
+  game.typed="";
+  $("answerBox").innerHTML="&nbsp;";
+  $("gToast").textContent="";
+
+  game.a=rand2to9();
+  game.b=rand2to9();
+  $("question").textContent=`${game.a} × ${game.b} = ?`;
+  game.startMs=Date.now();
+
+  $("gStars").textContent=state.stars;
+  $("gLeaves").textContent=state.leaves;
+  $("gIndex").textContent=game.index+1;
+  $("gTotal").textContent=game.total;
+}
+
+function ensureBirths(){
+  const should = 1 + Math.floor(state.stars/15);
+  let born=null;
+  let any=0;
+  const oldTrees=treesNow();
+
+  while(state.koalas.length < should){
+    const seed=Date.now() + state.koalas.length*999 + Math.floor(Math.random()*9999);
+    const rare = Math.random() < 0.02; // %2
+    const baby = rare ? makeRare(seed) : makeKoala(seed);
+    state.koalas.push(baby);
+    born=baby;
+    any++;
+  }
+
+  const newTrees=treesNow();
+  return {any, born, tree: newTrees>oldTrees};
+}
+
+/* ========= GLOBAL BUTTON FUNCTIONS ========= */
+window.startMode=function(mode){
+  const c=cfg(mode);
+  game.mode=mode;
+  game.total=c.total;
+  game.index=0;
+  $("modeText").textContent=c.label;
+  show("game");
+  nextQ();
+};
 
 window.backHome=function(){
-show("home")
-render()
-}
+  show("home");
+  renderHome();
+  $("toast").textContent="";
+};
 
 window.showForest=function(){
-show("forest")
-forestGrid.innerHTML="🐨".repeat(state.koalas)
-}
+  show("forest");
+  renderForest();
+  $("fToast").textContent="Orman burada 🌳";
+};
 
-let a=2,b=2
+window.tap=function(d){
+  if(game.typed.length>=3) return;
+  game.typed+=d;
+  $("answerBox").textContent=game.typed;
+};
 
-function newQuestion(){
-a=Math.floor(Math.random()*8)+2
-b=Math.floor(Math.random()*8)+2
-question.textContent=a+" × "+b+" = ?"
-answer.value=""
-}
+window.clearAns=function(){
+  game.typed="";
+  $("answerBox").innerHTML="&nbsp;";
+};
 
-window.check=function(){
-const val=Number(answer.value)
-if(val===a*b){
-state.stars++
-if(state.stars%5===0){
-state.koalas++
-openOverlay("Yeni Koala! 🎉","Ormana yeni bir koala katıldı.")
-}
-}
-save()
-newQuestion()
-}
+window.ok=function(){
+  const ans=Number(game.typed);
+  if(Number.isNaN(ans)){ $("gToast").textContent="Bir sayı yaz 🙂"; return; }
 
-function openOverlay(title,text){
-document.getElementById("ovTitle").textContent=title
-document.getElementById("ovText").textContent=text
-document.getElementById("overlay").style.display="flex"
-}
+  const correct=game.a*game.b;
+  const dt=Date.now()-game.startMs;
 
-window.closeOverlay=function(){
-document.getElementById("overlay").style.display="none"
-}
+  if(ans===correct){
+    state.stars += 1;
+    const l=leavesFor(dt);
+    state.leaves += l;
+    $("gToast").textContent = (l===2)?"Çok hızlı! 🍃🍃":(l===1)?"Hızlı! 🍃":"Doğru! 🐨";
+  }else{
+    $("gToast").textContent = `Cevap: ${correct}`;
+  }
 
-render()
+  const births=ensureBirths();
+  save();
+
+  $("gStars").textContent=state.stars;
+  $("gLeaves").textContent=state.leaves;
+
+  const qc=$("qcard");
+  qc.classList.remove("pulse"); void qc.offsetWidth; qc.classList.add("pulse");
+
+  // Overlay tetik
+  if(births.any>0){
+    if(births.tree){
+      openOverlay("Yeni ağaç açıldı! 🌳✨", "Orman genişledi. Koalalar topluca sevindi!");
+    }else if(births.born && births.born.kind==="rare"){
+      openOverlay("Nadir bir misafir geldi! ✨", births.born.name + " ormana uğradı.");
+    }else{
+      openOverlay("Yeni koala doğdu! 🎉", "Hoş geldin küçük koala!");
+    }
+  }
+
+  game.index += 1;
+  if(game.index>=game.total){
+    setTimeout(()=>{ window.backHome(); $("toast").textContent="Tur bitti 🌿"; }, 300);
+  }else{
+    setTimeout(()=>nextQ(), 300);
+  }
+};
+
+/* INIT */
+save();
+renderHome();
+$("toast").textContent="Hazır ✅";
 </script>
-
 </body>
 </html>
