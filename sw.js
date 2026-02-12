@@ -1,4 +1,4 @@
-const CACHE = "koala-ormani-v3";
+const CACHE = "koala-ormani-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -23,7 +23,7 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
 
-  // HTML: network-first (güncelleme gelsin), offline olursa cache
+  // HTML: network-first
   if (req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html")) {
     e.respondWith((async () => {
       try {
@@ -39,7 +39,7 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // Diğerleri: cache-first
+  // Others: cache-first
   e.respondWith(
     caches.match(req).then((r) => r || fetch(req))
   );
