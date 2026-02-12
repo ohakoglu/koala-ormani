@@ -1,15 +1,9 @@
-const CACHE = "koala-ormani-v4";
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./manifest.json"
-];
+const CACHE = "koala-ormani-v5";
+const ASSETS = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(ASSETS))
-  );
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
 });
 
 self.addEventListener("activate", (e) => {
@@ -32,15 +26,12 @@ self.addEventListener("fetch", (e) => {
         cache.put("./index.html", fresh.clone());
         return fresh;
       } catch {
-        const cached = await caches.match("./index.html");
-        return cached || new Response("Offline", { status: 200 });
+        return (await caches.match("./index.html")) || new Response("Offline", { status: 200 });
       }
     })());
     return;
   }
 
-  // Others: cache-first
-  e.respondWith(
-    caches.match(req).then((r) => r || fetch(req))
-  );
+  // Diğerleri: cache-first
+  e.respondWith(caches.match(req).then((r) => r || fetch(req)));
 });
