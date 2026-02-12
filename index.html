@@ -11,24 +11,26 @@
     .wrap { max-width: 520px; margin: 0 auto; padding: 16px; }
     .card { background:#fff; border-radius:16px; padding:16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); }
     h1 { font-size: 22px; margin: 0 0 10px; }
-    .sub { opacity:.75; margin: 0 0 14px; }
+    .sub { opacity:.75; margin: 0 0 14px; font-weight:700; }
 
-    .btn { width:100%; border:0; border-radius:14px; padding:14px; margin:10px 0; font-size:16px; font-weight:800; background:#1F6FEB; color:#fff; }
+    .btn { width:100%; border:0; border-radius:14px; padding:14px; margin:10px 0; font-size:16px; font-weight:900; background:#1F6FEB; color:#fff; }
     .btn.secondary { background:#EAF2FF; color:#1F6FEB; }
     .btn.ghost { background:#F1F5F9; color:#0f172a; }
 
     .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
-    .pill { background:#F1F5F9; padding:10px 12px; border-radius:999px; font-weight:800; }
-
-    .toast { margin-top: 10px; font-weight: 800; min-height: 24px; }
+    .pill { background:#F1F5F9; padding:10px 12px; border-radius:999px; font-weight:900; }
+    .toast { margin-top: 10px; font-weight: 900; min-height: 24px; }
     .hidden { display:none; }
+
+    /* küçük sürüm etiketi */
+    .ver { display:inline-block; margin-left:10px; font-size:12px; font-weight:900; padding:6px 10px; border-radius:999px; background:#EAF2FF; color:#1F6FEB; }
 
     /* GAME */
     .topbar { display:flex; justify-content:space-between; align-items:center; gap:10px; }
     .topbar .left { display:flex; gap:10px; flex-wrap:wrap; }
     .qcard { background:#fff; border-radius:16px; padding:16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); margin-top:12px; }
     .q { font-size: 38px; font-weight: 900; text-align:center; margin: 6px 0 8px; }
-    .hint { text-align:center; opacity:.75; margin:0 0 10px; font-weight:700; }
+    .hint { text-align:center; opacity:.75; margin:0 0 10px; font-weight:800; }
     .ans { font-size: 28px; font-weight: 900; text-align:center; background:#F8FAFC; border-radius:14px; padding:12px; min-height: 38px; }
 
     .keypad { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
@@ -38,7 +40,7 @@
     .pulse { animation: pulse 0.5s ease-in-out 2; }
     @keyframes pulse { 0% { transform: scale(1);} 50% { transform: scale(1.03);} 100% { transform: scale(1);} }
 
-    /* KOALA (sevimli 2D kart) */
+    /* KOALA kartları (emoji değil) */
     .koalaStrip { display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
     .koala {
       width: 52px; height: 52px;
@@ -47,9 +49,8 @@
       display:flex; align-items:center; justify-content:center;
       box-shadow: 0 6px 16px rgba(0,0,0,.08);
       overflow:hidden;
-      transform: translateZ(0);
     }
-    .koala::before { /* kulaklar */
+    .koala::before {
       content:"";
       position:absolute;
       width: 18px; height: 18px; border-radius: 10px;
@@ -64,16 +65,8 @@
       font-size: 16px;
       font-weight: 900;
     }
-    .acc {
-      position:absolute; right: 6px; bottom: 6px;
-      font-size: 14px;
-      filter: drop-shadow(0 2px 2px rgba(0,0,0,.15));
-    }
-    .lvl {
-      position:absolute; left: 6px; bottom: 6px;
-      font-size: 12px;
-      opacity: .9;
-    }
+    .acc { position:absolute; right: 6px; bottom: 6px; font-size: 14px; }
+    .lvl { position:absolute; left: 6px; bottom: 6px; font-size: 12px; opacity: .9; }
 
     /* FOREST */
     .forestWrap { margin-top: 12px; }
@@ -85,11 +78,7 @@
       box-shadow: 0 6px 20px rgba(0,0,0,.06);
       border: 1px solid rgba(15,23,42,.06);
     }
-    .treeHead {
-      display:flex; justify-content:space-between; align-items:center;
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
+    .treeHead { display:flex; justify-content:space-between; align-items:center; font-weight: 900; margin-bottom: 10px; }
     .slots { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; }
     .slot {
       height: 62px;
@@ -119,7 +108,7 @@
       overflow:hidden;
     }
     .modal h2 { margin: 0 0 6px; font-size: 18px; }
-    .modal p { margin: 0 0 12px; opacity:.8; font-weight:700; }
+    .modal p { margin: 0 0 12px; opacity:.8; font-weight:800; }
     .confetti {
       position:absolute; inset:-40px;
       background:
@@ -127,7 +116,6 @@
         radial-gradient(circle at 70% 35%, rgba(122,214,161,.55) 0 6px, transparent 7px),
         radial-gradient(circle at 40% 70%, rgba(200,185,255,.55) 0 6px, transparent 7px),
         radial-gradient(circle at 85% 75%, rgba(234,246,255,.9) 0 6px, transparent 7px);
-      filter: blur(.2px);
       opacity: .9;
       animation: floaty 2.2s ease-in-out infinite;
       pointer-events:none;
@@ -143,7 +131,10 @@
 
     <!-- HOME -->
     <div class="card" id="home">
-      <h1>Peri ve İpek’in Koala Ormanı</h1>
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <h1 style="margin:0;">Peri ve İpek’in Koala Ormanı <span class="ver">v5</span></h1>
+      </div>
+
       <p class="sub">Bugün 5 dakika. Üzülmek yok. Koalalar büyür.</p>
 
       <button class="btn" onclick="startMode('speed')">Hız Turu</button>
@@ -200,7 +191,7 @@
 
     <!-- FOREST -->
     <div class="card hidden" id="forest">
-      <h1>Orman</h1>
+      <h1>Orman <span class="ver">ağaçlı</span></h1>
       <p class="sub">Koalalar ağaçlara yerleşir. Yeni koala doğunca orman sevinir.</p>
 
       <div class="row">
@@ -230,34 +221,98 @@
   </div>
 
   <script>
-    // ====== STATE ======
-    // v4: koalalar artık obje listesi (varyasyonlu)
-    const SKEY="koala_state_v4";
+    // ========= OTOMATİK CACHE/WORKER TEMİZLİĞİ (1 kere) =========
+    // Amaç: sen elle Safari cache temizlemek zorunda kalma.
+    (async function migrateSWOnce(){
+      try{
+        const flag = localStorage.getItem("koala_sw_migrated_v5");
+        if(flag === "1") return;
+
+        // Eski service worker’ları kapat
+        if ("serviceWorker" in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (const r of regs) await r.unregister();
+        }
+
+        // Eski cache’leri sil
+        if (window.caches) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+
+        localStorage.setItem("koala_sw_migrated_v5", "1");
+
+        // Bir kere yenile (yeni dosyalar gelsin)
+        location.reload();
+      } catch {
+        // sorun olursa sessiz geç
+      }
+    })();
+
+    // ========= STATE (eski sürümlerden geçiş dahil) =========
+    const SKEY="koala_state_v5";
+
+    function structuredCloneSafe(obj){ return JSON.parse(JSON.stringify(obj)); }
 
     const defaultState = {
       stars: 0,
       leaves: 0,
       trees: 1,
-      koalas: [
-        makeKoala(Date.now() % 1000000) // ilk koala
-      ]
+      koalas: [ makeKoala(Date.now() % 1000000) ]
     };
 
     const state = loadState();
+
     function loadState(){
-      try {
-        const raw = localStorage.getItem(SKEY);
-        if(!raw) return structuredCloneSafe(defaultState);
-        const s = JSON.parse(raw);
-        // eski kaydı toparla
-        if(!Array.isArray(s.koalas)) s.koalas = [makeKoala(12345)];
-        if(typeof s.trees !== "number") s.trees = Math.max(1, Math.ceil(s.koalas.length/4));
-        return s;
-      } catch {
-        return structuredCloneSafe(defaultState);
+      // Önce yeni key
+      const rawNew = localStorage.getItem(SKEY);
+      if(rawNew){
+        try { return normalize(JSON.parse(rawNew)); } catch {}
       }
+
+      // Eski key’lerden (v3/v4) taşımaya çalış
+      const candidates = ["koala_state_v4","koala_state_v3","koala_state_v2","koala_state_v1"];
+      for(const k of candidates){
+        const r = localStorage.getItem(k);
+        if(!r) continue;
+        try{
+          const old = JSON.parse(r);
+          const converted = convertOld(old);
+          localStorage.setItem(SKEY, JSON.stringify(converted));
+          return converted;
+        } catch {}
+      }
+
+      const fresh = structuredCloneSafe(defaultState);
+      localStorage.setItem(SKEY, JSON.stringify(fresh));
+      return fresh;
     }
-    function structuredCloneSafe(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+    function normalize(s){
+      if(typeof s.stars !== "number") s.stars = 0;
+      if(typeof s.leaves !== "number") s.leaves = 0;
+      if(!Array.isArray(s.koalas)) s.koalas = [makeKoala(12345)];
+      s.trees = Math.max(1, Math.ceil(s.koalas.length/4));
+      return s;
+    }
+
+    function convertOld(old){
+      // old: {stars, leaves, koalas:number} veya {stars,leaves,koalas:[...]}
+      let stars = Number(old.stars||0);
+      let leaves = Number(old.leaves||0);
+
+      let koalasArr = [];
+      if(Array.isArray(old.koalas)){
+        // zaten obje listesi olabilir
+        koalasArr = old.koalas.map(x => (x && x.id) ? x : makeKoala(Date.now()+Math.random()*9999));
+      } else {
+        const count = Math.max(1, Number(old.koalas||1));
+        for(let i=0;i<count;i++) koalasArr.push(makeKoala(Date.now()+i*9999));
+      }
+
+      const s = { stars, leaves, koalas: koalasArr, trees: Math.max(1, Math.ceil(koalasArr.length/4)) };
+      return normalize(s);
+    }
 
     function save(){
       state.trees = Math.max(1, Math.ceil(state.koalas.length/4));
@@ -268,58 +323,30 @@
     function gToast(msg){ document.getElementById("gToast").textContent = msg; }
     function fToast(msg){ document.getElementById("fToast").textContent = msg; }
 
-    // ====== KOALA VARIATION ======
-    function pick(arr, seed){
-      return arr[seed % arr.length];
-    }
-    function rng(seed){
-      // basit deterministik "random"
-      let x = Math.sin(seed) * 10000;
-      return x - Math.floor(x);
-    }
-
-    const PALETTES = [
-      { base:"#C8B9FF", face:"#FFFFFF55" }, // lavanta
-      { base:"#BFE8C6", face:"#FFFFFF55" }, // mint
-      { base:"#A7D8FF", face:"#FFFFFF55" }, // açık mavi
-      { base:"#FFD6E7", face:"#FFFFFF55" }, // pudra
-      { base:"#D3D8E6", face:"#FFFFFF55" }, // gri-mavi
-      { base:"#FFE7B0", face:"#FFFFFF55" }, // krem
-      { base:"#B7F0FF", face:"#FFFFFF55" }, // turkuaz
-      { base:"#D9FFE1", face:"#FFFFFF55" }  // açık yeşil
-    ];
-
-    const ACCESSORIES = ["", "🌿", "🌸", "🧣", "⭐", "👑"]; // hafif, sevimli
+    // ========= KOALA VARYASYON =========
+    function rng(seed){ let x = Math.sin(seed) * 10000; return x - Math.floor(x); }
+    const PALETTES = ["#C8B9FF","#BFE8C6","#A7D8FF","#FFD6E7","#D3D8E6","#FFE7B0","#B7F0FF","#D9FFE1"];
+    const ACCESSORIES = ["","🌿","🌸","🧣","⭐","👑"];
 
     function makeKoala(seed){
       const pIndex = Math.floor(rng(seed)*PALETTES.length);
       const aIndex = Math.floor(rng(seed*7.1)*ACCESSORIES.length);
       const eyeIndex = 1 + Math.floor(rng(seed*11.7)*3); // 1..3
-      const lvl = 1; // şimdilik sabit (sonra büyütürüz)
-      return {
-        id: String(seed) + "_" + Math.floor(rng(seed*3.3)*100000),
-        palette: pIndex,
-        accessory: aIndex,
-        eyes: eyeIndex,
-        lvl
-      };
+      return { id: String(seed)+"_"+Math.floor(rng(seed*3.3)*100000), palette:pIndex, accessory:aIndex, eyes:eyeIndex, lvl:1 };
     }
-
     function koalaEyesChar(eyes){
       if(eyes===1) return "•ᴥ•";
       if(eyes===2) return "˘ᴥ˘";
       return "•⩊•";
     }
-
     function koalaLevelEmoji(lvl){
       if(lvl===1) return "🌱";
       if(lvl===2) return "🌿";
       if(lvl===3) return "🍃";
       return "✨";
     }
-
     function koalaCard(k, big=false){
-      const pal = PALETTES[k.palette] || PALETTES[0];
+      const bg = PALETTES[k.palette] || PALETTES[0];
       const acc = ACCESSORIES[k.accessory] || "";
       const size = big ? 62 : 52;
 
@@ -327,11 +354,10 @@
       el.className = "koala";
       el.style.width = size+"px";
       el.style.height = size+"px";
-      el.style.background = pal.base;
+      el.style.background = bg;
 
       const face = document.createElement("div");
       face.className = "koFace";
-      face.style.background = pal.face;
       face.style.fontSize = big ? "18px" : "16px";
       face.textContent = koalaEyesChar(k.eyes);
 
@@ -349,7 +375,7 @@
       return el;
     }
 
-    // ====== UI RENDER ======
+    // ========= UI =========
     function renderHome(){
       document.getElementById("stars").textContent = state.stars;
       document.getElementById("leaves").textContent = state.leaves;
@@ -357,8 +383,7 @@
 
       const strip = document.getElementById("homeKoalas");
       strip.innerHTML = "";
-      const showCount = Math.min(8, state.koalas.length);
-      for(let i=0;i<showCount;i++){
+      for(let i=0;i<Math.min(8, state.koalas.length); i++){
         strip.appendChild(koalaCard(state.koalas[i]));
       }
     }
@@ -377,8 +402,7 @@
       const grid = document.getElementById("forestGrid");
       grid.innerHTML = "";
 
-      const totalTrees = state.trees;
-      for(let t=0;t<totalTrees;t++){
+      for(let t=0; t<state.trees; t++){
         const tree = document.createElement("div");
         tree.className = "tree";
 
@@ -390,15 +414,14 @@
         const slots = document.createElement("div");
         slots.className = "slots";
 
-        for(let s=0;s<4;s++){
+        for(let s=0; s<4; s++){
           const idx = t*4 + s;
           const slot = document.createElement("div");
           slot.className = "slot";
-          if(state.koalas[idx]){
-            slot.appendChild(koalaCard(state.koalas[idx], true));
-          }
+          if(state.koalas[idx]) slot.appendChild(koalaCard(state.koalas[idx], true));
           slots.appendChild(slot);
         }
+
         tree.appendChild(slots);
         grid.appendChild(tree);
       }
@@ -423,7 +446,7 @@
       fToast("Orman burada 🌳 Koalalar yuvalarda.");
     }
 
-    // ====== OVERLAY ======
+    // ========= OVERLAY =========
     function openOverlay(type){
       const ov = document.getElementById("overlay");
       const title = document.getElementById("ovTitle");
@@ -431,10 +454,8 @@
       const row = document.getElementById("ovKoalas");
       row.innerHTML = "";
 
-      // son koala + birkaç koala daha zıplasın
       const last = state.koalas[state.koalas.length-1];
-      const list = [];
-      list.push(last);
+      const list = [last];
       for(let i=Math.max(0, state.koalas.length-4); i<state.koalas.length-1; i++){
         list.push(state.koalas[i]);
       }
@@ -455,20 +476,16 @@
 
       ov.classList.add("show");
     }
-    function closeOverlay(){
-      document.getElementById("overlay").classList.remove("show");
-    }
+    function closeOverlay(){ document.getElementById("overlay").classList.remove("show"); }
 
-    // ====== GAME ENGINE ======
+    // ========= GAME =========
     const game = { mode:"speed", total:10, index:0, a:2, b:2, startMs:0, typed:"" };
-
     function rand2to9(){ return Math.floor(Math.random()*8)+2; }
     function configForMode(mode){
       if(mode==="speed") return { total: 12, label: "Hız Turu" };
       if(mode==="target") return { total: 10, label: "Hedef Turu" };
       return { total: 20, label: "Boss" };
     }
-
     function startMode(mode){
       const cfg = configForMode(mode);
       game.mode = mode;
@@ -478,38 +495,30 @@
       show("game");
       nextQuestion();
     }
-
     function nextQuestion(){
       game.typed = "";
       document.getElementById("answerBox").innerHTML = "&nbsp;";
       gToast("");
-
       game.a = rand2to9();
       game.b = rand2to9();
       document.getElementById("question").textContent = `${game.a} × ${game.b} = ?`;
       game.startMs = Date.now();
-
       renderGameTop();
     }
-
     function tap(d){
       if(game.typed.length >= 3) return;
       game.typed += d;
       document.getElementById("answerBox").textContent = game.typed;
     }
-
     function clearAns(){
       game.typed = "";
       document.getElementById("answerBox").innerHTML = "&nbsp;";
     }
-
     function leavesFor(ms){
       if(ms < 2500) return 2;
       if(ms < 4000) return 1;
       return 0;
     }
-
-    // her 15 yıldızda 1 koala
     function ensureKoalas(){
       const shouldCount = 1 + Math.floor(state.stars/15);
       let born = 0;
@@ -518,18 +527,14 @@
         state.koalas.push(makeKoala(seed));
         born++;
       }
-      return born; // kaç koala doğdu
+      return born;
     }
-
     function ok(){
       const ans = Number(game.typed);
       const correctAns = game.a * game.b;
       const dt = Date.now() - game.startMs;
 
-      if(Number.isNaN(ans)){
-        gToast("Bir sayı yaz 🙂");
-        return;
-      }
+      if(Number.isNaN(ans)){ gToast("Bir sayı yaz 🙂"); return; }
 
       let msg = "";
       if(ans === correctAns){
@@ -553,7 +558,6 @@
       const qc = document.getElementById("qcard");
       qc.classList.remove("pulse"); void qc.offsetWidth; qc.classList.add("pulse");
 
-      // Toplu animasyon tetikle
       if(born > 0){
         setTimeout(() => openOverlay(newTree ? "tree" : "koala"), 250);
       }
@@ -566,9 +570,9 @@
       }
     }
 
-    // ====== OFFLINE (service worker) ======
+    // Yeni service worker
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js?v=4");
+      navigator.serviceWorker.register("sw.js?v=5");
     }
 
     // INIT
